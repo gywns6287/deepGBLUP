@@ -11,5 +11,8 @@ We propose a novel genomic prediction algorithm, which integrates deep learning 
 ### 0. Requirements
 We build deepGBLUP on the **Python 3.9** and **Ubuntu 18.04**. We recommend **anaconda** environment for deepGBLUP.
 ### 1. Installation
-
 1. Clone this repository
+2. Build the virtual environment
+```
+conda create -n env python=3.9
+```
