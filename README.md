@@ -9,7 +9,7 @@ We propose a novel genomic prediction algorithm, which integrates deep learning 
 
 ## Implementation
 ### 0. Requirements
-We build deepGBLUP on the **Python 3.9** and **Ubuntu 18.04**. We recommend **anaconda** environment for deepGBLUP.
+We build deepGBLUP on the **Python 3.9**, **Ubuntu 18.04**, and **cuda11.3**. We recommend **anaconda** environment for deepGBLUP.
 ### 1. Installation
 1. Clone this repository
 2. Build the virtual environment
@@ -17,4 +17,11 @@ We build deepGBLUP on the **Python 3.9** and **Ubuntu 18.04**. We recommend **an
 conda create -n venv python=3.9
 conda activate venv
 ```
-3. asdasd
+3. Install pytorch:
+```
+# For CUDA 11.3
+conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge
+
+# For CPU Only
+conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cpuonly -c pytorch
+```
