@@ -30,7 +30,10 @@ conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cpuonly -c 
 pip install -r requirements.txt
 ```
 ### 2. Excution
-1. Open the 'main.py' file and set configuration
+0. Input Data format
+**raw**: The genotype data of `plink`.  See https://www.cog-genomics.org/plink2/formats#raw for more details.
+
+1. Open the 'main.py' file and set configuration.  You can implement deepGBLUP with sample data by using default configuration.
 ```
 # data path
 raw_path: path of raw file
@@ -49,6 +52,5 @@ h2: heritability
 cal_effect:  boolean - True:  Save snp effect with LD-blocks' effect.
 save_path: path to save results
 ```
- You can implement deepGBLUP with sample data by using default configuration.
 
 
