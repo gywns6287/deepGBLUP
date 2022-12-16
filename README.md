@@ -66,3 +66,16 @@ save_path: path to save results
 python main.py
 ```
 
+3. Output files
+```
+init.pth: initial weights file
+last.pth: trained weights file
+log.txt: training log file
+setting.txt: text file to save configuration
+sol.txt: text file to save individuals' gEBV.
+
+(optional-for-cal_effect=True)
+snp_effects.txt: text file to save snp effects, which is calcualted by epistasis-interfused SNPs.
+manhattan.png: manhattan plot for snp effects
+
+```
