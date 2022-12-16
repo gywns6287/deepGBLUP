@@ -14,5 +14,7 @@ We build deepGBLUP on the **Python 3.9** and **Ubuntu 18.04**. We recommend **an
 1. Clone this repository
 2. Build the virtual environment
 ```
-conda create -n env python=3.9
+conda create -n venv python=3.9
+conda activate venv
 ```
+3. asdasd
