@@ -1,0 +1,9 @@
+Path of raw file: data/1000_samples.raw
+Path of phenotype file: data/1000_samples.phen
+--------------------------------------------------
+Best learning rate: 1e-05
+Best epoch: 4
+--------------------------------------------------
+H2: 0.37
+Running time: 99.10016918182373s
+Device: cuda
