@@ -37,6 +37,7 @@ pip install -r requirements.txt
 The genotype data of `plink`.  See https://www.cog-genomics.org/plink2/formats#raw for more details.
 
 **2) phenotype**
+
 The phenotype data. It is a `.txt` file involving two columns. First column is animal name, which must be matched with **raw** file. Second column is phenotype.
 deepGBLUP automatically sets the individuals included in **raw** file but not in the **phenotype** file as test individuals.
 See data/1000_samples.phen as an example format.
