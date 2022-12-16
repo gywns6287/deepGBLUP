@@ -25,3 +25,30 @@ conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit
 # For CPU Only
 conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cpuonly -c pytorch
 ```
+3. Install requirements
+```
+pip install -r requirements.txt
+```
+### 2. Excution
+1. Open the 'main.py' file and set configuration
+```
+# data path
+raw_path: path of raw file
+phen_path: path of phenotype file
+bim_path (optional): path of bim file to save SNP effects. If you don't have bim file just type None 
+
+# train cofig
+lr: list of cadidate learning rate
+epoch: max value of cadiate epoch
+grid_search: boolean - True: search the best learning rate and epoch; False: just use first lr and max epoch for training.
+vali_split: percentage of the validation set in the train set;  
+device: type 'cpu' if you use cpu device, or type 'cuda' if you use gpu device.
+h2: heritability
+
+# save config
+cal_effect:  boolean - True:  Save snp effect with LD-blocks' effect.
+save_path: path to save results
+```
+ You can implement deepGBLUP with sample data by using default configuration.
+
+
