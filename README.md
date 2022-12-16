@@ -31,7 +31,14 @@ pip install -r requirements.txt
 ```
 ### 2. Excution
 0. Input Data format
-**raw**: The genotype data of `plink`.  See https://www.cog-genomics.org/plink2/formats#raw for more details.
+
+**raw**
+The genotype data of `plink`.  See https://www.cog-genomics.org/plink2/formats#raw for more details.
+
+**phenotype**
+The phenotype data. It is a `.txt` file involving two columns. First column is animal name, which must be matched with **raw** file. Second column is phenotype.
+deepGBLUP automatically sets the individuals included in **raw** file but not in the **phenotype** file as test individuals.
+See data/1000_samples.phen as an example format.
 
 1. Open the 'main.py' file and set configuration.  You can implement deepGBLUP with sample data by using default configuration.
 ```
@@ -52,5 +59,8 @@ h2: heritability
 cal_effect:  boolean - True:  Save snp effect with LD-blocks' effect.
 save_path: path to save results
 ```
-
+2. Run deepGBLUP
+```
+python main.py
+```
 
