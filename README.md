@@ -42,7 +42,7 @@ The phenotype data. It is a `.txt` file involving two columns. First column is a
 deepGBLUP automatically sets the individuals included in **raw** file but not in the **phenotype** file as test individuals.
 See data/1000_samples.phen as an example format.
 
-1. Open the 'main.py' file and set configuration.  You can implement deepGBLUP with sample data by using default configuration.
+1. Open the 'main.py' file with text editor and set configuration.  You can implement deepGBLUP with sample data by using default configuration.
 ```
 # data path
 raw_path: path of raw file
