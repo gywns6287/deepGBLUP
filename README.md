@@ -3,9 +3,8 @@
  
 
 ## Model summary
-We propose a novel genomic prediction algorithm, which integrates deep learning and GBLUP (deepGBLUP). Given SNP markers, the proposed deepGBLUP first extracts epistasis based on locally-connected layers. Then, it estimates initial breeding values through a relation-aware module, which extends GBLUP to the deep learning framework. Finally, deepGBLUP estimates a breeding value bias using a fully connected layer and adds it to the initial breeding value for calculating the final breeding values.
+This is the official CODE of deepGBLUP. Summary will be updated...
 
-<img src = "https://user-images.githubusercontent.com/71325306/208086095-3471a61a-baf3-4db0-8a42-18f81ebe5842.png" width="40%" height="40%">
 
 ## Implementation
 ### 0. Requirements
@@ -50,15 +49,13 @@ phen_path: path of phenotype file
 bim_path (optional): path of bim file to save SNP effects. If you don't have bim file just type None 
 
 # train cofig
-lr: list of cadidate learning rate
-epoch: max value of cadiate epoch
-grid_search: boolean - True: search the best learning rate and epoch; False: just use first lr and max epoch for training.
-vali_split: percentage of the validation set in the train set;  
+lr: learning rate
+epoch: epoch
+batch_size: batch_size
 device: type 'cpu' if you use cpu device, or type 'cuda' if you use gpu device.
 h2: heritability
 
 # save config
-cal_effect:  boolean - True:  Save snp effect with LD-blocks' effect.
 save_path: path to save results
 ```
 2. Run deepGBLUP
@@ -68,14 +65,9 @@ python main.py
 
 3. Output files
 ```
-init.pth: initial weights file
 last.pth: trained weights file
 log.txt: training log file
 setting.txt: text file to save configuration
 sol.txt: text file to save individuals' gEBV.
-
-(optional-for-cal_effect=True)
-snp_effects.txt: text file to save snp effects, which is calcualted by epistasis-interfused SNPs.
-manhattan.png: manhattan plot for snp effects
 
 ```
