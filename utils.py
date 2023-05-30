@@ -1,103 +1,100 @@
-import os
-from tqdm import tqdm
-from math import sqrt, log10
-from collections import Counter
-
 import torch
+import math
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
+import os
+
+from tqdm import tqdm
 
 
-def perdictive_ability(true, pred, h2):
+def mixed_model(Z, A, lamb, y):
+        y = y - y.mean()
+        e  = torch.inverse(Z.T @ Z + A *lamb) @ Z.T @ y
+        return e
+
+def call_Z(ref_len, whole_len):
+    Z = torch.zeros((ref_len, whole_len),dtype=torch.float32)
+    for i in range(ref_len): Z[i,i] = 1
+    return Z
+
+def make_G_D_E(X, invers=True, device='cpu'):
+
+    # cal freq matrix
+    n,k = X.shape
+    pi = X.sum(0)/(2*n) # X.mean(0)/2
+    P = (pi).unsqueeze(0) 
+
+    # make A (dummay pedigree)
+    A = torch.eye(len(X))
+
+    # make G
+    Z = X - 2*P 
+    G = (Z @Z.T)  /(2*(pi*(1-pi)).sum()) 
+
+    # make D
+    print('make dominance matrix')
+    W = X.clone()
+    for j in tqdm(range(W.shape[1])):
+        W_j = W[:,j]
+        W_j[W_j == 0] = -2*(pi[j]**2)
+        W_j[W_j == 1] = 2*(pi[j]*(1-pi[j]))
+        W_j[W_j == 2] = -2*((1-pi[j])**2)
+
+    D = (W @W.T)  /(((2*pi*(1-pi))**2).sum()) 
+
+    # make E
+    print('make interaction marker')
+    M = X - 1 
+    E = 0.5*((M @ M.T) * (M @ M.T))  - 0.5*((M * M) @ (M * M).T) 
+    E = E/(torch.trace(E)/n) 
+    # E = D
+    del W, M
+
+    # rescaling with dummy A
+    G = G * 0.99 + A * 0.01
+    D = D * 0.99 + A * 0.01
+    E = E * 0.99 + A * 0.01
+
+    if invers:
+        return torch.inverse(G), torch.inverse(D), torch.inverse(E)
+    return G, D, E
+
+
+
+def GBLUP(train_X, test_X, train_y, test_y, h2):
+
+    X = torch.cat([train_X, test_X], dim=0)
+    train_len = len(train_y)
+
+    # Compute G
+    M = X - 1
+    pi = X.mean(0)/2
+    P = 2*(pi-0.5)
+    M = M - P 
+    G = (M @M.T)/(2*(pi*(1-pi)).sum())
+
+    G_inv = torch.inverse(G)
+    Z = torch.zeros((train_len, len(G_inv)),dtype=torch.float32)
+    for i in range(train_len): Z[i][i] = 1
+    y_c = (train_y - train_y.mean()).unsqueeze(1)
+    y_c = train_y.unsqueeze(1)
+    lamb = h2/(1 - h2)
+    
+    y_gblup = torch.inverse(Z.T @ Z + G_inv*lamb) @ Z.T @ y_c
+    # m1 = perdictive_ability(test_y, y_gblup[train_len:][:,0], h2)
+
+
+    return y_gblup[:,0][:train_len], y_gblup[:,0][train_len:], Z
+
+
+def perdictive_ability(true, pred, h2=1):
     pred_mean = pred.mean()
     true_mean = true.mean()
 
     f1 = torch.sum((pred - pred_mean) * (true - true_mean))
     f2 = torch.sqrt(torch.sum((pred - pred_mean)**2) * torch.sum((true - true_mean)**2))
+    if f2 == 0:
+        return 0
 
     cor = f1/f2 
-    return float(cor/sqrt(h2))
-
-def association_study(model, train_X, test_X, y, device, SNP_names, bim_path, save_path):
-    X = torch.cat([train_X, test_X], dim=0).to(device)
-
-    # Extract LD-effects interfused SNPs
-    _, M = model(X.to(device))
-    M = M[:len(y)].detach().cpu().numpy()
-    y = y.numpy()
-
-    effects = []
-    print('Doing association study')
-    for i in tqdm(range(M.shape[1])):
-        slope, intercept, r_value, p_value, std_err = stats.linregress(y, M[:,i])
-        e = -log10(p_value)
-        effects.append(e)
-    effects = np.array(effects)
-
-    if bim_path:
-        # call marker information
-        bim ={}
-        with open(bim_path) as b:
-            for line in b:
-                line_ = line.split()
-                if '_' in line_[1]:
-                    line_[1] = '_'.join(i.split('_')[:-1])
-                bim[line_[1]] = (line_[0],line_[3])
-
-    # save effect as txt file    
-    save =  open(os.path.join(save_path,'snp_effects.txt'), 'w')
-
-    save.write('Marker\tChr\tPos\tEffect\n')
-    chr_count = []
-    for m, e in zip(SNP_names, effects):
-        if '_' in m:
-            m = '_'.join(m.split('_')[:-1])
-        if bim_path:
-            c, p = bim[m]
-            chr_count.append(c)
-        else:
-            c = p = 'na'
-        save.write(f'{m}\t{c}\t{p}\t{e}\n')
-    save.close()
-
-    # vis effect as manhattan plot
-    # calculate chromosom axis position
-    if bim_path:
-        chr_count = Counter(chr_count)
-        chrs =  sorted(chr_count.keys(), key = lambda k: int(k))
-        chr_idx = []
-        cumsum = 0
-        for c in chrs:
-            chr_idx.append(cumsum + chr_count[c]//2)
-            cumsum += chr_count[c]
-
-    # vis
-    fig, ax = plt.subplots(figsize=(13,5))
-    ylim = (0, np.max(effects)*1.1)
-
-    ax.set_title('SNP effects')
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.grid(True,ls='--',lw=1,alpha=1,axis='x')
-    ax.set_ylim(ylim) 
-    if bim_path:
-        plt.xticks(chr_idx,chrs)
-
-    # scatter plot
-    cumsum = 0
-    colors = ['tab:blue','tab:red']
-    if bim_path:
-        for c in chrs:
-            chr_len = chr_count[c]
-            chr_which = range(cumsum,cumsum+chr_len)
-            chr_effects = effects[chr_which]
-            ax.scatter(chr_which, chr_effects, s=5, c = colors[int(c)%2])
-            cumsum += chr_len
-    else:
-        ax.scatter(list(range(len(effects))), effects, s=5, c = colors[0])
-
-    plt.savefig(os.path.join(save_path,f'manhatan.png'), bbox_inches='tight', pad_inches=0)
-
+    return float(cor/math.sqrt(h2))
 
