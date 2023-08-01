@@ -3,7 +3,7 @@
  
 
 ## Model summary
-This is the official CODE of deepGBLUP. Summary will be updated...
+This repo is the official Code of deepGBLUP: joint deep learning networks and GBLUP framework for accurate genomic prediction of complex traits in Korean native cattle. For details, please refer the paper [link].
 
 
 ## Implementation
